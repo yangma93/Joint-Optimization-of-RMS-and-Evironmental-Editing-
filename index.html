@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KGCCA Research | 路侧监测传感器与环境编辑联合优化</title>
+<meta name="description" content="Joint Optimization of Roadside Monitoring Sensors and Environmental Editing for Cost-effective Cooperative Perception - 论文宣传页" />
+
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============ 全局变量 ============ */
+:root{
+  --primary:#0B5ED7;
+  --primary-2:#1677FF;
+  --accent:#00A6FB;
+  --bg-soft:#EAF4FF;
+  --bg-softer:#F6FAFF;
+  --bg-light:#DDEEFF;
+  --text-dark:#102A43;
+  --text-mid:#3B5A7A;
+  --text-light:#6B84A3;
+  --white:#ffffff;
+  --border:#E1ECFB;
+  --shadow-sm:0 2px 8px rgba(11,94,215,0.06);
+  --shadow-md:0 8px 24px rgba(11,94,215,0.10);
+  --shadow-lg:0 16px 48px rgba(11,94,215,0.15);
+  --radius:14px;
+  --radius-lg:20px;
+  --max-w:1280px;
+  --transition: all .35s cubic-bezier(.22,.61,.36,1);
+}
+
+/* ============ 基础 ============ */
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Noto Sans SC','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:var(--text-dark);
+  background:var(--white);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ============ 容器 ============ */
+.container{
+  max-width:var(--max-w);
+  margin:0 auto;
+  padding:0 32px;
+}
+
+/* ============ 导航栏 ============ */
+.navbar{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:72px;
+}
+.nav-brand{display:flex;align-items:center;gap:12px}
+.logo-mark{
+  width:40px;height:40px;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-size:18px;
+  box-shadow:0 4px 12px rgba(11,94,215,0.3);
+  position:relative;
+  overflow:hidden;
+}
+.logo-mark::after{
+  content:'';
+  position:absolute;
+  inset:6px;
+  border:1.5px solid rgba(255,255,255,0.4);
+  border-radius:6px;
+}
+.brand-text .brand-name{
+  font-weight:700;
+  font-size:16px;
+  color:var(--text-dark);
+  letter-spacing:.3px;
+}
+.brand-text .brand-sub{
+  font-size:11px;
+  color:var(--text-light);
+  letter-spacing:.5px;
+}
+
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:32px;
+}
+.nav-links a{
+  font-size:14.5px;
+  font-weight:500;
+  color:var(--text-mid);
+  transition:var(--transition);
+  position:relative;
+}
+.nav-links a::after{
+  content:'';
+  position:absolute;
+  left:0;right:0;
+  bottom:-6px;
+  height:2px;
+  background:var(--primary);
+  transform:scaleX(0);
+  transition:var(--transition);
+}
+.nav-links a:hover{color:var(--primary)}
+.nav-links a:hover::after{transform:scaleX(1)}
+
+.nav-cta{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 20px;
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-2) 100%);
+  color:#fff;
+  border-radius:10px;
+  font-size:14px;
+  font-weight:600;
+  box-shadow:0 4px 14px rgba(11,94,215,0.25);
+  transition:var(--transition);
+}
+.nav-cta:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(11,94,215,0.35);
+}
+
+.hamburger{
+  display:none;
+  width:40px;height:40px;
+  align-items:center;justify-content:center;
+  color:var(--primary);
+  font-size:22px;
+}
+
+/* ============ HERO ============ */
+.hero{
+  position:relative;
+  padding:70px 0 80px;
+  overflow:hidden;
+  background:
+    radial-gradient(1200px 500px at 90% -10%, rgba(0,166,251,0.08), transparent 60%),
+    radial-gradient(900px 400px at -10% 30%, rgba(22,119,255,0.06), transparent 60%),
+    var(--white);
+}
+.hero::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(11,94,215,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(11,94,215,0.04) 1px, transparent 1px);
+  background-size:40px 40px;
+  mask-image:radial-gradient(ellipse at center, black 30%, transparent 75%);
+  -webkit-mask-image:radial-gradient(ellipse at center, black 30%, transparent 75%);
+  pointer-events:none;
+}
+.hero-grid{
+  position:relative;
+  display:grid;
+  grid-template-columns:1.35fr 1fr;
+  gap:56px;
+  align-items:center;
+}
+
+/* Hero 左侧图片 */
+.hero-visual{
+  position:relative;
+}
+.hero-image-wrap{
+  position:relative;
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  background:linear-gradient(135deg,#eaf4ff 0%,#dcecff 100%);
+  aspect-ratio:16/10;
+  box-shadow:var(--shadow-lg);
+  border:1px solid rgba(22,119,255,0.15);
+}
+.hero-image-wrap::before{
+  content:'';
+  position:absolute;inset:0;
+  background:
+    linear-gradient(135deg, rgba(11,94,215,0.06), transparent 60%),
+    linear-gradient(-45deg, rgba(0,166,251,0.08), transparent 55%);
+  pointer-events:none;
+  z-index:1;
+}
+.hero-image-wrap img{
+  width:100%;height:100%;object-fit:cover;
+  position:relative;z-index:0;
+}
+/* 图片加载失败或缺失时的占位画布 */
+.placeholder-canvas{
+  position:absolute;inset:0;
+  overflow:hidden;
+}
+.placeholder-canvas .grid-bg{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(11,94,215,0.10) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(11,94,215,0.10) 1px, transparent 1px);
+  background-size:28px 28px;
+}
+.placeholder-canvas .road{
+  position:absolute;
+  left:-10%;right:-10%;
+  top:55%;
+  height:22%;
+  background:linear-gradient(180deg, rgba(11,94,215,0.10), rgba(11,94,215,0.02));
+  transform:skewY(-6deg);
+  border-top:2px dashed rgba(11,94,215,0.35);
+  border-bottom:2px dashed rgba(11,94,215,0.25);
+}
+.placeholder-canvas .dots{
+  position:absolute;inset:0;
+}
+.placeholder-canvas .dots span{
+  position:absolute;
+  width:6px;height:6px;
+  background:var(--primary-2);
+  border-radius:50%;
+  opacity:.55;
+  box-shadow:0 0 12px rgba(22,119,255,0.5);
+}
+.placeholder-canvas .sensor{
+  position:absolute;
+  width:16px;height:16px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:
+    0 0 0 6px rgba(0,166,251,0.15),
+    0 0 0 14px rgba(0,166,251,0.08);
+}
+.placeholder-canvas .label{
+  position:absolute;
+  top:16px;left:16px;
+  font-size:11px;
+  color:var(--primary);
+  letter-spacing:1px;
+  font-weight:600;
+  background:rgba(255,255,255,0.85);
+  padding:5px 10px;
+  border-radius:20px;
+  border:1px solid rgba(11,94,215,0.15);
+}
+
+.hero-image-badge{
+  position:absolute;
+  bottom:16px;left:16px;
+  z-index:3;
+  background:rgba(255,255,255,0.92);
+  backdrop-filter:blur(8px);
+  padding:8px 14px;
+  border-radius:24px;
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--primary);
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid rgba(11,94,215,0.12);
+  box-shadow:var(--shadow-sm);
+}
+.hero-image-badge i{color:var(--accent)}
+.hero-caption{
+  margin-top:14px;
+  font-size:12.5px;
+  color:var(--text-light);
+  padding-left:8px;
+  border-left:3px solid var(--bg-light);
+}
+
+/* Hero 右侧文本 */
+.hero-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 14px;
+  background:var(--bg-soft);
+  color:var(--primary);
+  border-radius:100px;
+  font-size:12.5px;
+  font-weight:600;
+  letter-spacing:.5px;
+  margin-bottom:20px;
+}
+.hero-tag i{font-size:10px}
+.hero-title{
+  font-family:'Inter','Noto Sans SC',sans-serif;
+  font-size:34px;
+  line-height:1.25;
+  font-weight:800;
+  letter-spacing:-.3px;
+  color:var(--text-dark);
+  margin-bottom:12px;
+}
+.hero-title .accent{
+  background:linear-gradient(135deg,var(--primary) 0%,var(--accent) 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.hero-subtitle{
+  font-size:16.5px;
+  font-weight:500;
+  color:var(--text-mid);
+  margin-bottom:20px;
+}
+.hero-desc{
+  font-size:14.5px;
+  color:var(--text-mid);
+  line-height:1.85;
+  margin-bottom:24px;
+}
+.hero-badges{
+  display:flex;flex-wrap:wrap;gap:8px;
+  margin-bottom:28px;
+}
+.hero-badges .badge{
+  font-size:12px;
+  font-weight:500;
+  color:var(--primary);
+  background:var(--white);
+  border:1px solid var(--border);
+  padding:6px 12px;
+  border-radius:8px;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.hero-badges .badge i{font-size:10px;color:var(--accent)}
+
+.hero-buttons{
+  display:flex;gap:12px;flex-wrap:wrap;
+  margin-bottom:28px;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 22px;
+  border-radius:10px;
+  font-size:14px;font-weight:600;
+  transition:var(--transition);
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-2) 100%);
+  color:#fff;
+  box-shadow:0 6px 18px rgba(11,94,215,0.28);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(11,94,215,0.38)}
+.btn-secondary{
+  background:var(--white);
+  color:var(--primary);
+  border:1.5px solid var(--border);
+}
+.btn-secondary:hover{
+  border-color:var(--primary);
+  background:var(--bg-softer);
+}
+
+/* Hero 信息卡 */
+.info-card{
+  background:linear-gradient(135deg,var(--bg-softer) 0%,var(--white) 100%);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px 20px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px 20px;
+  box-shadow:var(--shadow-sm);
+}
+.info-item{display:flex;flex-direction:column;gap:2px}
+.info-label{
+  font-size:10.5px;
+  color:var(--text-light);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  font-weight:600;
+}
+.info-value{
+  font-size:13px;
+  color:var(--text-dark);
+  font-weight:600;
+}
+
+/* ============ Section 通用 ============ */
+.section{padding:90px 0}
+.section-tinted{background:linear-gradient(180deg,#F4FAFF 0%,#EAF4FF 100%)}
+.section-head{
+  text-align:center;
+  max-width:760px;
+  margin:0 auto 56px;
+}
+.section-eyebrow{
+  display:inline-block;
+  font-size:12px;
+  font-weight:700;
+  color:var(--primary);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  background:var(--bg-soft);
+  padding:5px 14px;
+  border-radius:100px;
+  margin-bottom:16px;
+}
+.section-title{
+  font-size:32px;
+  font-weight:800;
+  color:var(--text-dark);
+  margin-bottom:10px;
+  letter-spacing:-.3px;
+}
+.section-subtitle{
+  font-size:14px;
+  color:var(--text-light);
+  font-weight:500;
+  letter-spacing:.5px;
+  margin-bottom:14px;
+}
+.section-desc{
+  font-size:15px;
+  color:var(--text-mid);
+  line-height:1.8;
+}
+
+/* ============ 2x2 卡片网格 ============ */
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:28px;
+}
+.card{
+  position:relative;
+  background:var(--white);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  transition:var(--transition);
+  display:flex;flex-direction:column;
+}
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:var(--shadow-lg);
+  border-color:rgba(22,119,255,0.4);
+}
+.card.tinted{
+  background:linear-gradient(180deg,#fff 0%,#F6FAFF 100%);
+}
+.card.tinted::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg,var(--primary),var(--accent));
+}
+.card-media{
+  position:relative;
+  aspect-ratio:16/10;
+  background:linear-gradient(135deg,#F0F7FF 0%,#DDEEFF 100%);
+  overflow:hidden;
+  cursor:zoom-in;
+}
+.card-media img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .6s ease;
+}
+.card:hover .card-media img{transform:scale(1.04)}
+.card-number{
+  position:absolute;top:14px;left:14px;
+  z-index:3;
+  font-family:'Inter',sans-serif;
+  font-weight:800;
+  font-size:14px;
+  color:var(--primary);
+  background:rgba(255,255,255,0.92);
+  padding:5px 11px;
+  border-radius:8px;
+  box-shadow:var(--shadow-sm);
+}
+.card-zoom-hint{
+  position:absolute;
+  bottom:12px;right:12px;
+  z-index:3;
+  font-size:11px;
+  color:var(--primary);
+  background:rgba(255,255,255,0.9);
+  padding:5px 10px;
+  border-radius:20px;
+  display:inline-flex;align-items:center;gap:5px;
+  opacity:0;
+  transform:translateY(6px);
+  transition:var(--transition);
+}
+.card:hover .card-zoom-hint{opacity:1;transform:translateY(0)}
+.card-body{
+  padding:22px 24px 26px;
+  flex:1;
+  display:flex;flex-direction:column;
+}
+.card-icon{
+  width:38px;height:38px;
+  border-radius:10px;
+  background:var(--bg-soft);
+  color:var(--primary);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+  margin-bottom:12px;
+}
+.card-title{
+  font-size:17px;
+  font-weight:700;
+  color:var(--text-dark);
+  margin-bottom:4px;
+}
+.card-title-en{
+  font-size:12px;
+  color:var(--text-light);
+  font-weight:500;
+  letter-spacing:.5px;
+  margin-bottom:12px;
+}
+.card-desc{
+  font-size:13.5px;
+  color:var(--text-mid);
+  line-height:1.75;
+  flex:1;
+}
+.card-mini-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:14px;
+  font-size:11.5px;
+  font-weight:600;
+  color:var(--primary);
+  background:var(--bg-soft);
+  padding:5px 10px;
+  border-radius:6px;
+  align-self:flex-start;
+}
+
+/* ============ 结论模块 ============ */
+.conclusions{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:20px;
+}
+.conclusion-card{
+  background:var(--white);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:26px 22px;
+  transition:var(--transition);
+  position:relative;
+  overflow:hidden;
+}
+.conclusion-card:hover{
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-md);
+  border-color:rgba(22,119,255,0.4);
+}
+.conclusion-card::before{
+  content:'';
+  position:absolute;top:0;left:0;
+  width:40%;height:3px;
+  background:linear-gradient(90deg,var(--primary),var(--accent));
+  border-radius:0 3px 3px 0;
+}
+.conclusion-num{
+  font-family:'Inter',sans-serif;
+  font-weight:800;
+  font-size:13px;
+  color:var(--primary);
+  margin-bottom:10px;
+  letter-spacing:1px;
+}
+.conclusion-icon{
+  width:44px;height:44px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--bg-soft),var(--white));
+  border:1px solid var(--border);
+  color:var(--primary);
+  display:flex;align-items:center;justify-content:center;
+  font-size:19px;
+  margin-bottom:14px;
+}
+.conclusion-title{
+  font-size:15px;
+  font-weight:700;
+  color:var(--text-dark);
+  margin-bottom:8px;
+}
+.conclusion-text{
+  font-size:13px;
+  color:var(--text-mid);
+  line-height:1.7;
+}
+.conclusion-highlight{
+  margin-top:40px;
+  text-align:center;
+  padding:26px 32px;
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-2) 100%);
+  color:#fff;
+  border-radius:var(--radius);
+  font-size:15px;
+  font-weight:600;
+  line-height:1.7;
+  box-shadow:0 12px 32px rgba(11,94,215,0.25);
+  position:relative;
+  overflow:hidden;
+}
+.conclusion-highlight::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(400px 200px at 90% 100%, rgba(255,255,255,0.15), transparent 60%),
+    radial-gradient(400px 200px at 10% 0%, rgba(0,166,251,0.25), transparent 60%);
+  pointer-events:none;
+}
+.conclusion-highlight i{
+  margin-right:10px;
+  opacity:.9;
+}
+
+/* ============ Footer ============ */
+.footer{
+  background:linear-gradient(135deg,#0A2540 0%,#0B5ED7 100%);
+  color:#D6E4F5;
+  padding:64px 0 24px;
+  position:relative;
+  overflow:hidden;
+}
+.footer::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+}
+.footer-grid{
+  position:relative;
+  display:grid;
+  grid-template-columns:1.4fr 1fr 1.2fr;
+  gap:48px;
+  margin-bottom:40px;
+}
+.footer-brand .logo-mark{margin-bottom:16px}
+.footer-brand h4{
+  color:#fff;
+  font-size:17px;
+  margin-bottom:10px;
+}
+.footer-brand p{
+  font-size:13.5px;
+  line-height:1.75;
+  color:#B7CBE4;
+  margin-bottom:18px;
+  max-width:340px;
+}
+.footer-social{display:flex;gap:10px}
+.footer-social a{
+  width:38px;height:38px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;
+  transition:var(--transition);
+}
+.footer-social a:hover{
+  background:var(--accent);
+  transform:translateY(-3px);
+}
+.footer h5{
+  color:#fff;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  margin-bottom:18px;
+}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-links a{
+  font-size:14px;
+  color:#B7CBE4;
+  transition:var(--transition);
+}
+.footer-links a:hover{color:#fff;padding-left:6px}
+.footer-contact{list-style:none;display:flex;flex-direction:column;gap:14px}
+.footer-contact li{
+  font-size:13.5px;
+  color:#B7CBE4;
+  display:flex;align-items:flex-start;gap:10px;
+  line-height:1.6;
+}
+.footer-contact li i{
+  color:var(--accent);
+  margin-top:3px;
+  flex-shrink:0;
+}
+.footer-contact li span.tag{
+  display:inline-block;
+  font-size:10px;
+  padding:2px 6px;
+  background:rgba(255,193,7,0.2);
+  color:#FFD666;
+  border-radius:4px;
+  margin-left:6px;
+}
+.footer-bottom{
+  position:relative;
+  border-top:1px solid rgba(255,255,255,0.1);
+  padding-top:24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+  font-size:12.5px;
+  color:#8DA6C4;
+}
+.footer-bottom .note{
+  font-style:italic;
+  opacity:.75;
+}
+
+/* ============ Lightbox ============ */
+.lightbox{
+  position:fixed;
+  inset:0;
+  background:rgba(10,25,50,0.9);
+  backdrop-filter:blur(8px);
+  z-index:1000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:40px 20px;
+}
+.lightbox.active{display:flex}
+.lightbox-inner{
+  position:relative;
+  max-width:1100px;
+  width:100%;
+}
+.lightbox-image{
+  width:100%;
+  max-height:80vh;
+  object-fit:contain;
+  border-radius:var(--radius);
+  box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  background:#fff;
+}
+.lightbox-caption{
+  text-align:center;
+  color:#fff;
+  font-size:15px;
+  margin-top:18px;
+  font-weight:500;
+}
+.lightbox-close{
+  position:absolute;
+  top:-46px;right:0;
+  width:40px;height:40px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.12);
+  color:#fff;
+  border:1px solid rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+  transition:var(--transition);
+}
+.lightbox-close:hover{background:rgba(255,255,255,0.22);transform:rotate(90deg)}
+
+/* ============ 动画 ============ */
+.fade-up{
+  opacity:0;
+  transform:translateY(30px);
+  transition:opacity .8s ease, transform .8s ease;
+}
+.fade-up.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important;transition:none !important}
+  .fade-up{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+
+/* ============ 响应式 ============ */
+@media (max-width: 1024px){
+  .container{padding:0 24px}
+  .hero-grid{grid-template-columns:1fr;gap:44px}
+  .hero-title{font-size:30px}
+  .conclusions{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px}
+}
+@media (max-width: 768px){
+  .nav-links{
+    position:fixed;
+    top:72px;left:0;right:0;
+    background:#fff;
+    flex-direction:column;
+    align-items:flex-start;
+    padding:20px 24px;
+    gap:18px;
+    border-bottom:1px solid var(--border);
+    box-shadow:var(--shadow-md);
+    transform:translateY(-120%);
+    transition:transform .35s ease;
+  }
+  .nav-links.open{transform:translateY(0)}
+  .nav-cta{display:none}
+  .hamburger{display:flex}
+  .section{padding:64px 0}
+  .section-title{font-size:26px}
+  .hero{padding:44px 0 60px}
+  .hero-title{font-size:26px}
+  .card-grid{grid-template-columns:1fr;gap:20px}
+  .conclusions{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr;gap:32px}
+  .footer-bottom{flex-direction:column;text-align:center}
+  .info-card{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ========== 导航栏 ========== -->
+<header class="navbar" role="banner">
+  <div class="container nav-inner">
+    <a class="nav-brand" href="#top" aria-label="返回首页">
+      <div class="logo-mark" aria-hidden="true">
+        <i class="fa-solid fa-satellite-dish"></i>
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">KGCCA Research</div>
+        <div class="brand-sub">Cooperative Perception Optimization</div>
+      </div>
+    </a>
+
+    <nav class="nav-links" id="navLinks" aria-label="主导航">
+      <a href="#top">首页</a>
+      <a href="#framework">工作框架</a>
+      <a href="#results">结果分析</a>
+      <a href="#conclusions">研究结论</a>
+      <a href="https://doi.org/10.1016/j.cacaie.2026.100230" target="_blank" rel="noopener">论文链接</a>
+    </nav>
+
+    <!-- 阅读论文按钮：跳转 DOI -->
+    <a class="nav-cta" href="https://doi.org/10.1016/j.cacaie.2026.100230" target="_blank" rel="noopener">
+      <i class="fa-solid fa-book-open"></i> 阅读论文
+    </a>
+
+    <button class="hamburger" id="hamburger" aria-label="切换菜单" aria-expanded="false">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+  </div>
+</header>
+
+<!-- ========== HERO ========== -->
+<section id="top" class="hero">
+  <div class="container hero-grid">
+
+    <!-- 左侧：核心示意图（可替换） -->
+    <div class="hero-visual fade-up">
+      <div class="hero-image-wrap">
+        <!-- 【图片替换位置】assets/images/hero-core-concept.jpg -->
+        <img
+          src="Fig. 1. Paradigm shift of sensor placement optimization.png"
+          alt="论文核心示意图：路侧传感器部署与环境编辑的联合优化"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='block';"
+        />
+        <!-- 图片缺失时的优雅占位画布 -->
+        <div class="placeholder-canvas" style="display:none">
+          <div class="grid-bg"></div>
+          <div class="road"></div>
+          <div class="dots">
+            <span style="left:15%;top:20%"></span>
+            <span style="left:32%;top:35%"></span>
+            <span style="left:48%;top:18%"></span>
+            <span style="left:65%;top:30%"></span>
+            <span style="left:78%;top:42%"></span>
+            <span style="left:22%;top:78%"></span>
+            <span style="left:55%;top:82%"></span>
+            <span style="left:82%;top:70%"></span>
+          </div>
+          <div class="sensor" style="left:25%;top:48%"></div>
+          <div class="sensor" style="left:60%;top:52%"></div>
+          <div class="sensor" style="left:82%;top:45%"></div>
+          <div class="label">POINT CLOUD × RMS DEPLOYMENT</div>
+        </div>
+
+        <div class="hero-image-badge">
+          <i class="fa-solid fa-layer-group"></i>
+          Sensor Layout × Environmental Editing
+        </div>
+      </div>
+      <p class="hero-caption">
+        论文示意图：传感器部署、道路场景、遮挡分析、环境编辑与协同感知结果的综合图。
+      </p>
+    </div>
+
+    <!-- 右侧：论文简介 -->
+    <div class="hero-text fade-up">
+      <div class="hero-tag">
+        <i class="fa-solid fa-circle"></i>
+        Research Highlight · 研究亮点
+      </div>
+      <h1 class="hero-title">
+        Joint Optimization of <span class="accent">Roadside Monitoring Sensors</span> and <span class="accent">Environmental Editing</span> for Cost-effective Cooperative Perception
+      </h1>
+      <p class="hero-subtitle">
+        面向成本效益协同感知的路侧监测传感器与环境编辑联合优化
+      </p>
+      <p class="hero-desc">
+        本研究针对复杂道路环境下路侧协同感知易受传感器布局、遮挡与环境条件影响的问题，提出将路侧监测传感器部署与环境编辑策略纳入统一优化框架。通过点云 BEV 仿真和 KGCCA 协同全局优化，在感知质量与部署/编辑成本之间寻求更具潜力的平衡方案。
+      </p>
+
+      <div class="hero-badges">
+        <span class="badge"><i class="fa-solid fa-cube"></i> BEV Point-cloud Simulation</span>
+        <span class="badge"><i class="fa-solid fa-network-wired"></i> KGCCA Global Optimization</span>
+        <span class="badge"><i class="fa-solid fa-database"></i> WHU-Urban3D Validation</span>
+      </div>
+
+      <div class="hero-buttons">
+        <a class="btn btn-primary" href="https://doi.org/10.1016/j.cacaine.2026.100230" target="_blank" rel="noopener" onclick="this.href='https://doi.org/10.1016/j.cacaie.2026.100230'">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> 访问论文 DOI
+        </a>
+        <a class="btn btn-secondary" href="#framework">
+          <i class="fa-solid fa-diagram-project"></i> 查看工作框架
+        </a>
+      </div>
+
+      <!-- 论文信息小卡片 -->
+      <div class="info-card">
+        <div class="info-item">
+          <span class="info-label">Dataset</span>
+          <span class="info-value">WHU-Urban3D</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Application</span>
+          <span class="info-value">Cooperative Roadside Perception</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Publication</span>
+          <span class="info-value">CACAIE, 2026</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">DOI</span>
+          <span class="info-value">10.1016/j.cacaie.2026.100230</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ========== 工作框架 ========== -->
+<section id="framework" class="section">
+  <div class="container">
+    <div class="section-head fade-up">
+      <span class="section-eyebrow">01 · Methodology</span>
+      <h2 class="section-title">工作框架</h2>
+      <p class="section-subtitle">Integrated Framework for Cost-effective Cooperative Perception</p>
+      <p class="section-desc">
+        从真实道路点云场景出发，构建 BEV 感知仿真与协同优化流程，将路侧传感器部署和环境编辑决策统一纳入规划阶段的优化框架。
+      </p>
+    </div>
+
+    <div class="card-grid">
+
+      <!-- 卡片 1 -->
+      <article class="card fade-up">
+        <div class="card-media" data-lightbox="工作框架 / Overall Framework" data-src="assets/images/framework-overview.jpg">
+          <div class="card-number">01</div>
+          <!-- 【图片替换】assets/images/framework-overview.jpg -->
+          <img src="Fig. 2. Overview of proposed workflow.png" alt="整体工作框架示意图" onerror="this.style.opacity=0" />
+          <div class="card-zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>点击放大</div>
+        </div>
+        <div class="card-body">
+          <div class="card-icon"><i class="fa-solid fa-diagram-project"></i></div>
+          <h3 class="card-title">工作框架</h3>
+          <div class="card-title-en">Overall Framework</div>
+          <p class="card-desc">
+            将点云场景建模、传感器配置、环境编辑、感知评价与优化决策集成为统一工作流。
+          </p>
+        </div>
+      </article>
+
+      <!-- 卡片 2 -->
+      <article class="card fade-up">
+        <div class="card-media" data-lightbox="BEV 仿真 / BEV Simulation" data-src="assets/images/bev-simulation.jpg">
+          <div class="card-number">02</div>
+          <!-- 【图片替换】assets/images/bev-simulation.jpg -->
+          <img src="Fig. C1. Interactive tool for creating PG.png" alt="BEV 点云仿真示意图" onerror="this.style.opacity=0" />
+          <div class="card-zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>点击放大</div>
+        </div>
+        <div class="card-body">
+          <div class="card-icon"><i class="fa-solid fa-map"></i></div>
+          <h3 class="card-title">BEV 仿真</h3>
+          <div class="card-title-en">BEV Simulation</div>
+          <p class="card-desc">
+            基于点云鸟瞰图构建仿真环境，为不同路侧感知方案提供可比较的评价基础。
+          </p>
+        </div>
+      </article>
+
+      <!-- 卡片 3 -->
+      <article class="card fade-up">
+        <div class="card-media" data-lightbox="KGCCA 算法流程 / KGCCA Optimization" data-src="assets/images/kgcca-flowchart.jpg">
+          <div class="card-number">03</div>
+          <!-- 【图片替换】assets/images/kgcca-flowchart.jpg -->
+          <img src="Fig. 9. Framework of KGCCA.png" alt="KGCCA 优化算法流程图" onerror="this.style.opacity=0" />
+          <div class="card-zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>点击放大</div>
+        </div>
+        <div class="card-body">
+          <div class="card-icon"><i class="fa-solid fa-code-branch"></i></div>
+          <h3 class="card-title">KGCCA 算法流程</h3>
+          <div class="card-title-en">KGCCA Optimization</div>
+          <p class="card-desc">
+            通过协同全局优化搜索传感器部署与环境编辑的高潜力组合方案。
+          </p>
+        </div>
+      </article>
+
+      <!-- 卡片 4 -->
+      <article class="card fade-up">
+        <div class="card-media" data-lightbox="应用结果示意 / Application Illustration" data-src="assets/images/application-result.jpg">
+          <div class="card-number">04</div>
+          <!-- 【图片替换】assets/images/application-result.jpg -->
+          <img src="Fig. 16. Optimization results of KGCCA and BCCA (a) Site 5, (b) Site 6, and (c) Site 7.png" alt="应用结果示意图" onerror="this.style.opacity=0" />
+          <div class="card-zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>点击放大</div>
+        </div>
+        <div class="card-body">
+          <div class="card-icon"><i class="fa-solid fa-bullseye"></i></div>
+          <h3 class="card-title">应用结果示意</h3>
+          <div class="card-title-en">Application Illustration</div>
+          <p class="card-desc">
+            输出可用于规划决策的传感器配置与环境修整建议，并支持后续工程可行性审查。
+          </p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========== 结果分析 ========== -->
+<section id="results" class="section section-tinted">
+  <div class="container">
+    <div class="section-head fade-up">
+      <span class="section-eyebrow">02 · Results</span>
+      <h2 class="section-title">结果分析</h2>
+      <p class="section-subtitle">Evaluation and Visual Analysis</p>
+      <p class="section-desc">
+        基于真实城市点云数据，论文从场景空间分布、障碍物影响、方案对比与代理指标有效性等角度，分析联合优化框架的应用价值。
+      </p>
+    </div>
+
+    <div class="card-grid">
+
+      <!-- 结果卡 1 -->
+      <article class="card tinted fade-up">
+        <div class="card-media" data-lightbox="地点图示 / Study Area" data-src="assets/images/site-map.jpg">
+          <div class="card-number">01</div>
+          <!-- 【图片替换】assets/images/site-map.jpg -->
+          <img src="Fig. 11. Test sites extracted from WHU-urban3D (a) instances (b) PG.png" alt="研究地点图示" onerror="this.style.opacity=0" />
+          <div class="card-zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>点击放大</div>
+        </div>
+        <div class="card-body">
+          <div class="card-icon"><i class="fa-solid fa-location-dot"></i></div>
+          <h3 class="card-title">地点图示</h3>
+          <div class="card-title-en">Study Area</div>
+          <p class="card-desc">
+            展示真实城市道路实验场景及其空间环境特征，为传感器部署和环境编辑提供数据基础。
+          </p>
+        </div>
+      </article>
+
+      <!-- 结果卡 2 -->
+      <article class="card tinted fade-up">
+        <div class="card-media" data-lightbox="障碍物识别 / Obstacle Identification" data-src="assets/images/obstacle-identification.jpg">
+          <div class="card-number">02</div>
+          <!-- 【图片替换】assets/images/obstacle-identification.jpg -->
+          <img src="Fig. 12. Examples of occlusion detection (a) Site 5, (b) Site 6, and (c) Site 7.png" alt="障碍物识别示意图" onerror="this.style.opacity=0" />
+          <div class="card-zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>点击放大</div>
+        </div>
+        <div class="card-body">
+          <div class="card-icon"><i class="fa-solid fa-tree-city"></i></div>
+          <h3 class="card-title">障碍物识别</h3>
+          <div class="card-title-en">Obstacle Identification</div>
+          <p class="card-desc">
+            识别可能造成遮挡的环境要素，为环境编辑策略与感知视野优化提供依据。
+          </p>
+        </div>
+      </article>
+
+      <!-- 结果卡 3 -->
+      <article class="card tinted fade-up">
+        <div class="card-media" data-lightbox="结果对比 / Result Comparison" data-src="assets/images/result-comparison.jpg">
+          <div class="card-number">03</div>
+          <!-- 【图片替换】assets/images/result-comparison.jpg -->
+          <img src="Fig. 14. Fitness curve of different methods (a) 2 RMS and (b) 3 RMS.png" alt="不同方案结果对比图" onerror="this.style.opacity=0" />
+          <div class="card-zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>点击放大</div>
+        </div>
+        <div class="card-body">
+          <div class="card-icon"><i class="fa-solid fa-chart-column"></i></div>
+          <h3 class="card-title">结果对比</h3>
+          <div class="card-title-en">Result Comparison</div>
+          <p class="card-desc">
+            对比不同部署与环境策略下的感知表现，突出联合决策相对于孤立决策的协同优势。
+          </p>
+          <span class="card-mini-tag"><i class="fa-solid fa-link"></i> Layout + Editing Synergy</span>
+        </div>
+      </article>
+
+      <!-- 结果卡 4 -->
+      <article class="card tinted fade-up">
+        <div class="card-media" data-lightbox="仿真验证 / Surrogate Metric Validation" data-src="assets/images/simulation-validation.jpg">
+          <div class="card-number">04</div>
+          <!-- 【图片替换】assets/images/simulation-validation.jpg -->
+          <img src="Fig. 18. Comparisons of different methods (a) mIoU, (b) Dev.png" alt="代理指标验证图" onerror="this.style.opacity=0" />
+          <div class="card-zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i>点击放大</div>
+        </div>
+        <div class="card-body">
+          <div class="card-icon"><i class="fa-solid fa-square-root-variable"></i></div>
+          <h3 class="card-title">仿真验证</h3>
+          <div class="card-title-en">Surrogate Metric Validation</div>
+          <p class="card-desc">
+            验证基于直方图的 KL 散度作为优化代理指标的排序可靠性，并关联任务级感知评价。
+          </p>
+          <span class="card-mini-tag"><i class="fa-solid fa-wave-square"></i> KL Divergence · mIoU · Dev</span>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========== 研究结论 ========== -->
+<section id="conclusions" class="section">
+  <div class="container">
+    <div class="section-head fade-up">
+      <span class="section-eyebrow">03 · Takeaways</span>
+      <h2 class="section-title">研究结论</h2>
+      <p class="section-subtitle">Key Takeaways</p>
+    </div>
+
+    <div class="conclusions">
+      <div class="conclusion-card fade-up">
+        <div class="conclusion-num">01</div>
+        <div class="conclusion-icon"><i class="fa-solid fa-object-group"></i></div>
+        <h4 class="conclusion-title">联合优化范式</h4>
+        <p class="conclusion-text">将路侧监测传感器部署与环境编辑统一纳入同一决策框架，避免仅针对单一因素进行局部优化。</p>
+      </div>
+
+      <div class="conclusion-card fade-up">
+        <div class="conclusion-num">02</div>
+        <div class="conclusion-icon"><i class="fa-solid fa-cube"></i></div>
+        <h4 class="conclusion-title">点云驱动的 BEV 仿真</h4>
+        <p class="conclusion-text">基于真实城市点云场景建立鸟瞰图仿真，为路侧协同感知方案的评估提供高保真空间基础。</p>
+      </div>
+
+      <div class="conclusion-card fade-up">
+        <div class="conclusion-num">03</div>
+        <div class="conclusion-icon"><i class="fa-solid fa-network-wired"></i></div>
+        <h4 class="conclusion-title">KGCCA 协同搜索</h4>
+        <p class="conclusion-text">面向传感器配置与环境策略的组合决策开展协同全局搜索，发现具有成本效益潜力的方案。</p>
+      </div>
+
+      <div class="conclusion-card fade-up">
+        <div class="conclusion-num">04</div>
+        <div class="conclusion-icon"><i class="fa-solid fa-wave-square"></i></div>
+        <h4 class="conclusion-title">KL 散度代理评价</h4>
+        <p class="conclusion-text">采用基于直方图的 KL 散度作为优化代理指标，并与 mIoU、平均轨迹偏差等任务指标进行关系验证。</p>
+      </div>
+
+      <div class="conclusion-card fade-up">
+        <div class="conclusion-num">05</div>
+        <div class="conclusion-icon"><i class="fa-solid fa-helmet-safety"></i></div>
+        <h4 class="conclusion-title">面向工程实施的规划支持</h4>
+        <p class="conclusion-text">框架服务于规划阶段的方案筛选；最终实施仍应结合安装条件、供电、安装高度与工程可行性进行细化论证。</p>
+      </div>
+    </div>
+
+    <div class="conclusion-highlight fade-up">
+      <i class="fa-solid fa-lightbulb"></i>
+      从"单纯增加传感器"转向"传感器—环境协同设计"，为成本效益导向的路侧协同感知规划提供新思路。
+    </div>
+  </div>
+</section>
+
+<!-- ========== 页脚 ========== -->
+<footer class="footer" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+
+      <!-- 左侧：品牌 -->
+      <div class="footer-brand">
+        <div class="logo-mark" aria-hidden="true">
+          <i class="fa-solid fa-satellite-dish"></i>
+        </div>
+        <h4>KGCCA Research</h4>
+        <p>Research showcase for cooperative roadside perception and environment-aware optimization.</p>
+        <div class="footer-social">
+          <!-- 【链接替换】DOI -->
+          <a href="https://doi.org/10.1016/j.cacaie.2026.100230" target="_blank" rel="noopener" aria-label="论文 DOI"><i class="fa-solid fa-book"></i></a>
+          <!-- 【链接替换】Email -->
+          <a href="mailto:mayang@hfut.edu.cn" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+          <!-- 【链接替换】GitHub -->
+          <a href="#" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+        </div>
+      </div>
+
+      <!-- 中间：快捷链接 -->
+      <div>
+        <h5>Quick Links</h5>
+        <ul class="footer-links">
+          <li><a href="#top">首页 Home</a></li>
+          <li><a href="#framework">工作框架 Framework</a></li>
+          <li><a href="#results">结果分析 Results</a></li>
+          <li><a href="#conclusions">研究结论 Takeaways</a></li>
+          <li><a href="https://doi.org/10.1016/j.cacaie.2026.100230" target="_blank" rel="noopener">论文 DOI</a></li>
+        </ul>
+      </div>
+
+      <!-- 右侧：联系方式 -->
+      <div>
+        <h5>Contact</h5>
+        <ul class="footer-contact">
+          <li>
+            <i class="fa-solid fa-envelope"></i>
+            <span>syw@fzu.edu.cn|mayang@hfut.edu.cn </span></span>
+          </li>
+          <li>
+            <i class="fa-solid fa-building-columns"></i>
+            <span>福州大学 合肥工业大学 Toronto Metropolitan University</span></span>
+          </li>
+          <li>
+            <i class="fa-solid fa-link"></i>
+            <span><a href="https://doi.org/10.1016/j.cacaie.2026.100230" target="_blank" rel="noopener" style="color:#B7CBE4;text-decoration:underline">doi.org/10.1016/j.cacaie.2026.100230</a></span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <div>© 2026 KGCCA Research. Academic Project Showcase.</div>
+       </div>
+  </div>
+</footer>
+
+<!-- ========== Lightbox ========== -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="图片预览">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lightboxClose" aria-label="关闭预览">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <img id="lightboxImage" class="lightbox-image" src="" alt="" />
+    <div id="lightboxCaption" class="lightbox-caption"></div>
+  </div>
+</div>
+
+<script>
+/* ============ 导航菜单切换（移动端） ============ */
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.getElementById('navLinks');
+hamburger.addEventListener('click', () => {
+  const isOpen = navLinks.classList.toggle('open');
+  hamburger.setAttribute('aria-expanded', isOpen);
+});
+navLinks.querySelectorAll('a').forEach(a=>{
+  a.addEventListener('click',()=>{
+    navLinks.classList.remove('open');
+    hamburger.setAttribute('aria-expanded',false);
+  });
+});
+
+/* ============ 滚动淡入动画 ============ */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:0.12});
+document.querySelectorAll('.fade-up').forEach(el=>io.observe(el));
+
+/* ============ Lightbox 交互 ============ */
+const lightbox = document.getElementById('lightbox');
+const lightboxImage = document.getElementById('lightboxImage');
+const lightboxCaption = document.getElementById('lightboxCaption');
+const lightboxClose = document.getElementById('lightboxClose');
+
+document.querySelectorAll('[data-lightbox]').forEach(el=>{
+  el.addEventListener('click',()=>{
+    const src = el.getAttribute('data-src');
+    const caption = el.getAttribute('data-lightbox');
+    lightboxImage.src = src;
+    lightboxImage.alt = caption;
+    lightboxCaption.textContent = caption;
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  });
+});
+function closeLightbox(){
+  lightbox.classList.remove('active');
+  document.body.style.overflow = '';
+}
+lightboxClose.addEventListener('click',closeLightbox);
+lightbox.addEventListener('click',(e)=>{
+  if(e.target === lightbox) closeLightbox();
+});
+document.addEventListener('keydown',(e)=>{
+  if(e.key === 'Escape' && lightbox.classList.contains('active')) closeLightbox();
+});
+</script>
+</body>
+</html>
